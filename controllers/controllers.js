@@ -92,11 +92,14 @@ const noteFileUpload = async (req, res, next) => {
 const getAllNotes = async (req, res, next) => {
     try {
 
-        const { subject } = req.query;
+        const { subject , chapter } = req.query;
         const queryObject = {}
 
         if (subject){
             queryObject.subject = { $regex:subject, $options:"i"};
+        }
+        if (chapter){
+            queryObject.chapter = { $regex:chapter, $options:"i"};
         }
         let page = Number(req.query.page);
         let limit = Number(req.query.limit);
