@@ -7,9 +7,9 @@ app.use(cors());
 const bodyParser = require('body-parser')
 const fileRoutes = require('./routes/router')
 const connectDB = require('./db/connect')
-const Port = process.env.Port ||4000
-app.listen(Port,()=>{
-    console.log(`Server is listening to Port ${Port} ......`)
+const PORT = process.env.PORT || 4000;
+app.listen(PORT,()=>{
+    console.log(`Server is listening to Port ${PORT} ......`)
 })
 
 
