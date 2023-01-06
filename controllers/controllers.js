@@ -2,11 +2,31 @@
 
 const note = require('../models/note')
 const pyq = require('../models/pyq')
+const contact = require('../models/feedback')
 
 
 const myApi = async (req,res)=>{
     res.status(200).json({msg:'Hurray My API Is live'});
 
+}
+const feedbackUpload = async (req,res,next) =>{
+    try {
+        const file = new contact({
+            // fileName: req.file.originalname,
+            // filePath: req.file.path,
+            // fileType: req.file.mimetype,
+            // fileSize: fileSizeFormatter(req.file.size, 2), //0.00
+            userName: req.body.userName,
+            userEmail: req.body.userEmail,
+            userFeedback: req.body.userFeedback,
+            
+        });
+        await file.save();
+        console.log(file);
+        res.status(201).send('File Upload Successfully');
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
 }
 
 
@@ -129,4 +149,4 @@ const fileSizeFormatter = (bytes, decimal) => {
     return parseFloat((bytes / Math.pow(1000, index)).toFixed(dm)) + '' + sizes[index];
 }
 
-module.exports = { pyqFileUpload, noteFileUpload, getAllPyq, getAllNotes ,myApi }
+module.exports = { pyqFileUpload, noteFileUpload, getAllPyq, getAllNotes ,myApi ,feedbackUpload }
