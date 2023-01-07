@@ -1,9 +1,23 @@
 require("dotenv").config();
 const {google} = require('googleapis')
+// const CLIENT_ID = '283287698711-9a3q4taur5k5jrf1usfbf8j61peuig1i.apps.googleusercontent.com' ;
+
 const CLIENT_ID = process.env.CLIENT_ID ;
+console.log(CLIENT_ID);
+
+        
+// const CLIENT_SECRET = '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' ;
+
 const CLIENT_SECRET = process.env.CLIENT_SECRET ;
+
+console.log(CLIENT_SECRET);
+// const REDIRECT_URI = 'https://developers.google.com/oauthplayground' ;
 const REDIRECT_URI = process.env.REDIRECT_URI ;
+console.log(REDIRECT_URI);
+// const REFRESH_TOKEN = '1//0glb8ZHUbOXM3CgYIARAAGBASNwF-L9IrwCoB46s1NtGgQ9I3iPnd2z7nv8s4PvzaJNc7bUtmf1r1qFajosmg56IQHckrAZaSKc0';
+
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
+console.log(REFRESH_TOKEN);
 const fs = require('fs')
 const note = require('../models/note')
 const pyq = require('../models/pyq')
@@ -194,6 +208,7 @@ const noteFileUpload = async (req, res, next) => {
         });
         await file.save();
         console.log(file);
+        
         res.status(201).send('File Upload Successfully');
     } catch (error) {
         res.status(400).send(error.message);
