@@ -1,9 +1,27 @@
 
-
+const {google} = require('googleapis')
+const CLIENT_ID = '283287698711-9a3q4taur5k5jrf1usfbf8j61peuig1i.apps.googleusercontent.com';
+const CLIENT_SECRET = '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';
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = '1//0glb8ZHUbOXM3CgYIARAAGBASNwF-L9IrwCoB46s1NtGgQ9I3iPnd2z7nv8s4PvzaJNc7bUtmf1r1qFajosmg56IQHckrAZaSKc0';
+const fs = require('fs')
 const note = require('../models/note')
 const pyq = require('../models/pyq')
 const contact = require('../models/feedback')
 
+
+const oauth2Client = new google.auth.OAuth2(
+    CLIENT_ID,
+    CLIENT_SECRET,
+    REDIRECT_URI
+);
+
+oauth2Client.setCredentials({refresh_token: REFRESH_TOKEN });
+
+const drive = google.drive({
+    version:'v3',
+    auth:oauth2Client
+})
 
 const myApi = async (req,res)=>{
     res.status(200).json({msg:'Hurray My API Is live'});
@@ -32,9 +50,46 @@ const feedbackUpload = async (req,res,next) =>{
 
 const pyqFileUpload = async (req, res, next) => {
     try {
+
+        const userFilePath = req.file.path;
+        const userFileName = req.file.originalname;
+        const userMimeType = req.file.mimetype;
+
+
+        const gdriveResponse = await drive.files.create({
+            requestBody:{
+                name:userFileName,
+                mimeType:userMimeType
+            },
+            media:{
+                mimeType:userMimeType,
+                body: fs.createReadStream(userFilePath)
+            }
+        })
+        console.log(gdriveResponse.data);
+        const gData = gdriveResponse.data;
+        const fileId = gData.id;
+        console.log(fileId);
+
+        await drive.permissions.create({
+            fileId:fileId,
+            requestBody:{
+                role:'reader',
+                type:'anyone'
+            }
+        })
+
+        const gResult = drive.files.get({
+            fileId: fileId,
+            fields: 'webViewLink, webContentLink'
+        })
+        const gFileUrl = gResult.data;
+        console.log(gFileUrl);
+
+
         const file = new pyq({
             fileName: req.file.originalname,
-            filePath: req.file.path,
+            filePath: fileId,
             fileType: req.file.mimetype,
             fileSize: fileSizeFormatter(req.file.size, 2), //0.00
             subject: req.body.subject,
@@ -89,12 +144,48 @@ const getAllPyq = async (req, res, next) => {
         res.status(400).send(error.message)
     }
 }
-
 const noteFileUpload = async (req, res, next) => {
     try {
+
+        const userFilePath = req.file.path;
+        const userFileName = req.file.originalname;
+        const userMimeType = req.file.mimetype;
+
+
+        const gdriveResponse = await drive.files.create({
+            requestBody:{
+                name:userFileName,
+                mimeType:userMimeType
+            },
+            media:{
+                mimeType:userMimeType,
+                body: fs.createReadStream(userFilePath)
+            }
+        })
+        console.log(gdriveResponse.data);
+        const gData = gdriveResponse.data;
+        const fileId = gData.id;
+        console.log(fileId);
+
+        await drive.permissions.create({
+            fileId:fileId,
+            requestBody:{
+                role:'reader',
+                type:'anyone'
+            }
+        })
+
+        const gResult = drive.files.get({
+            fileId: fileId,
+            fields: 'webViewLink, webContentLink'
+        })
+        const gFileUrl = gResult.data;
+        console.log(gFileUrl);
+
         const file = new note({
             fileName: req.file.originalname,
-            filePath: req.file.path,
+            filePath: fileId,
+            
             fileType: req.file.mimetype,
             fileSize: fileSizeFormatter(req.file.size, 2), //0.00
             chapter: req.body.chapter,
@@ -108,6 +199,24 @@ const noteFileUpload = async (req, res, next) => {
         res.status(400).send(error.message);
     }
 }
+// const noteFileUpload = async (req, res, next) => {
+//     try {
+//         const file = new note({
+//             fileName: req.file.originalname,
+//             filePath: req.file.path,
+//             fileType: req.file.mimetype,
+//             fileSize: fileSizeFormatter(req.file.size, 2), //0.00
+//             chapter: req.body.chapter,
+//             subject: req.body.subject,
+//             credit: req.body.credit,
+//         });
+//         await file.save();
+//         console.log(file);
+//         res.status(201).send('File Upload Successfully');
+//     } catch (error) {
+//         res.status(400).send(error.message);
+//     }
+// }
 
 const getAllNotes = async (req, res, next) => {
     try {

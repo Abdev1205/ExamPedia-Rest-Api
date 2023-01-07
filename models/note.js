@@ -11,6 +11,11 @@ const noteSchema = new Schema ({
         required : true,
         
     },
+    // fileDownloadPath: {
+    //     type: String,
+    //     required : true,
+        
+    // },
     fileType: {
         type: String,
         required : true,
